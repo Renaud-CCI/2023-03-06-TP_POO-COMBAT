@@ -14,10 +14,13 @@ class Hero{
     }
     
 
-    /* hitMonster() est la fonction qui fait le combat */
+    /* hit() est la fonction qui fait le combat */
+    public function hit(Monster $monster){
+        $damage = rand(0,50);
+        $monsterHealth_point = $monster->getHealth_point();
+        $monster->setHealth_point($monsterHealth_point - $damage);
 
-    public function hitMonster(){
-
+        return $damage;
     }
 
 

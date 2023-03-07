@@ -1,6 +1,7 @@
 <?php
 class HeroesManager {
     private $db;
+    private $heroesArray = [];
 
     //FUNCTIONS
 
@@ -27,11 +28,9 @@ class HeroesManager {
             $hero->setHealth_point($heroInformations['health_point']);
             $hero->setAvatar($heroInformations['avatar']);
 
-            if ($hero->getHealth_point() > 0) {
-                $_SESSION['alert'] = "{$hero->getName()} existe déjà avec {$hero->getHealth_point()} PV";
-            } else {
+            if ($hero->getHealth_point() < 0) {
                 $_SESSION['alert'] = "{$hero->getName()} est déjà mort, choisissez-en un autre";
-            } 
+            }
         } else {
             // 'Pseudo libre :-)' le héro est créé et on set les variables
             $request = $this->db->prepare("INSERT INTO heroes (name, avatar) VALUES (:name, :avatar)");
@@ -50,19 +49,41 @@ class HeroesManager {
     /*Récupère en DB tous les héros avec PV>0 et les stocke dans un tableau */
     public function findAllAlive(){
         $request = $this->db->query("SELECT * FROM heroes WHERE health_point>0");
-        $heroes = $request->fetchAll();
+        $heroes = $request->fetchAll(PDO::FETCH_ASSOC);
 
-        $heroesArray = [];
 
         foreach($heroes as $hero){
-            array_push($heroesArray, $hero);
+            array_push($this->heroesArray, $hero);
         }
 
-        return $heroesArray;
+        return $this->heroesArray;
     }
 
+    /*faire une requête PDO et instancier un nouvel hero*/
+    public function find($id){
+        //Requete
+        $request = $this->db->prepare("SELECT * FROM heroes WHERE id=:id");
+        $request->execute(['id' => $id]);
+        $heroArray = $request->fetch(PDO::FETCH_ASSOC);
 
+        //Instanciation du Hero
+        $hero = new Hero($heroArray['name'], $heroArray['avatar']);
+        $hero->setId($heroArray['id']);
+        $hero->setHealth_point($heroArray['health_point']);
 
+        return $hero;
+
+    }
+
+    /*Enregistre les nouveaux PV en DB*/
+    public function update(Hero $hero){
+        $request = $this->db->prepare(" UPDATE heroes
+                                        SET health_point = :health_point
+                                        WHERE id = :id");
+        $request->execute([ 'health_point' => $hero->getHealth_point(),
+                            'id' => $hero->getId()
+                        ]);
+    }
 
     // GETTERS & SETTERS
 

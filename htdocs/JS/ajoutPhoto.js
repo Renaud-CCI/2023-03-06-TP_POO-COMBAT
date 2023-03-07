@@ -13,7 +13,7 @@ function updateImageDisplay() {
     var curFiles = input.files;
     if(curFiles.length === 0) {
       var para = document.createElement('p');
-      para.textContent = 'No files currently selected for upload';
+      para.textContent = '';
       preview.appendChild(para);
     } else {
       var list = document.createElement('ol');
@@ -22,7 +22,7 @@ function updateImageDisplay() {
         var listItem = document.createElement('li');
         var para = document.createElement('p');
         if(validFileType(curFiles[i])) {
-          para.textContent = 'File name ' + curFiles[i].name + ', file size ' + returnFileSize(curFiles[i].size) + '.';
+          para.textContent = 'Apperçu';
           var image = document.createElement('img');
           image.src = window.URL.createObjectURL(curFiles[i]);
   
