@@ -1,0 +1,46 @@
+@font-face {
+    font-family: "soccer";
+    src: url("./Soccer.ttf");
+  }
+  
+  /* Style pour le titre h1 */
+  h1 {
+    font-family: soccer;
+      font-size: 5rem;
+      text-align: center;
+      margin-top: 3rem;
+      color: #8a3ab9;
+    }
+
+    /* Style pour le champ de saisie */
+  .form-control {
+    margin-bottom: 1rem;
+    border-radius: 0.5rem;
+    font-size: 1.25rem;
+    padding: 1rem;
+    border: 2px solid #8a3ab9;
+  }
+  
+  /* Style pour le label du champ de saisie */
+  .form-label {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #8a3ab9;
+  }
+  
+  /* Style pour le bouton de soumission */
+  .btn-primary {
+    background-color: #8a3ab9;
+    border-color: #8a3ab9;
+    border-radius: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding: 1rem 2.5rem;
+    margin-top: 2rem;
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+  /* Style pour le texte du bouton de soumission */
+  .btn-primary:hover {
+    background-color: #8a3ab9;
+  }
