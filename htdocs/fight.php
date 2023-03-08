@@ -24,33 +24,55 @@ $db = require_once("./config/db.php");
     ?>
     <?php
         $heroesManager = new HeroesManager($db);
-        $fightManager = new FightsManager();
+        $fightManager = new FightsManager($db);
         $hero = $heroesManager->find($_GET['id']);
         $monster = $fightManager->createMonster();
         $fightResult = $fightManager->fight($hero, $monster);
         $heroesManager->update($hero);
+        $heroesManager->update($monster);
     ?>
 
 
     <div class="container">
+        <div class="row justify-content-center p-2" style="text-align:center;">
+            <div class="card col-5 col-lg-3 m-1" style="text-align:center;">
+                <div class="card-body">
+                    <h5 class="card-title">Hero</h5>
+                    <!-- <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6> -->
+                    <div class="mb-3">
+                        <img src="https://api.dicebear.com/5.x/adventurer/svg?seed=<?= $hero->getName() ?>">
+                        <p><?= $hero->getName() ?></p>
+                        <p>⚔️ <?= $hero->getHeroClass() ?></p>
+                        <p>❤️ <?= $hero->getHealthPoint() ?> HP</p>
+                    </div>
+                </div>
+            </div>
 
-        <div class="card" style="width: 18rem;margin:0 auto;text-align:center;margin-bottom:20px;">
-            <div class="card-body">
-                <h5 class="card-title">Hero existant</h5>
-                <!-- <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6> -->
-                <div class="mb-3">
-                    <img src="https://api.dicebear.com/5.x/adventurer/svg?seed=<?= $hero->getName() ?>">
-                    <p><?= $hero->getName() ?></p>
-                    <p>❤️ <?= $hero->getHealthPoint() ?> HP</p>
+            <div class="col-1 m-1 align-self-center" style="text-align:center;">
+                <div class="card-body">
+                    <h2 class="card-title">🌩️</h2>
+                </div>
+            </div>
+
+            <div class="card col-5 col-lg-3 m-1" style="text-align:center;">
+                <div class="card-body">
+                    <h5 class="card-title">Monstre</h5>
+                    <!-- <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6> -->
+                    <div class="mb-3">
+                        <img src="https://api.dicebear.com/5.x/bottts/svg?seed=<?= $monster->getName() ?>">
+                        <p><?= $monster->getName() ?></p>
+                        <p>⚔️ <?= $monster->getMonsterClass() ?></p>
+                        <p>❤️ <?= $monster->getHealthPoint() ?> HP</p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <ol class="list-group list-group-numbered">
+        <ul class="list-group list-group-numbered">
             <?php foreach ($fightResult as $key => $result) : ?>
                 <li class="list-group-item <?= $key % 2 ? 'list-group-item-primary' : 'list-group-item-danger' ?>"><?= $result ?></li>
             <?php endforeach; ?>   
-        </ol>
+        </ul>
     </div>
 
     <div style="margin:20px auto;width:200px;text-align:center;">

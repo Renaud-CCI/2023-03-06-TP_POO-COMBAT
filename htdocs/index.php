@@ -29,18 +29,20 @@ $db = require_once("./config/db.php");
         
 
         if(isset($_POST['name'])){
-            $hero = new Hero($_POST);
-            $manager->add($hero);
+            $hero = new $_POST['hero_class']($_POST);
+            $manager->add($hero); 
         }
 
-        $allHeroes = $manager->findAllAlive();
+        unset($_POST['name']);
+
+        $allHeroes = $manager->findAllAlive('heroes');
     ?>
 
 
 
     <div class="container ">
         <div class="row">
-            <div class="card col-12 col-sm-6 col-lg-2" style=text-align:center;">
+            <div class="card col-12 col-sm-6 col-lg-2 m-1" style=text-align:center;">
                 <div class="card-body">
 
 
@@ -50,6 +52,12 @@ $db = require_once("./config/db.php");
                         <div class="mb-3">
                             <label for="name" class="form-label">Nom de votre hero</label>
                             <input type="text" class="form-control" id="name" placeholder="Nom" name="name">
+                            <label for="hero_class" class="form-label">
+                            <select name="hero_class" id="hero_class">
+                                <option value="Archer">Archer</option>
+                                <option value="Guerrier">Guerrier</option>
+                                <option value="Mage">Mage</option>
+                            </select>
                         </div>
                         <button class="btn btn-primary btn-lg px-4 gap-3">Créer</button>
                     </form>
@@ -58,14 +66,15 @@ $db = require_once("./config/db.php");
             </div>
 
             <?php foreach ($allHeroes as $hero) : ?>
-            <div class="card col-12 col-sm-6 col-lg-2" style=text-align:center;">
+            <div class="card col-12 col-sm-6 col-lg-2 m-1" style="text-align:center;">
                 <div class="card-body">
 
                     <form method="get" action="fight.php">
                         <h5 class="card-title">Hero existant</h5>
                         <div class="mb-3">
                             <img src="https://api.dicebear.com/5.x/adventurer/svg?seed=<?= $hero->getName() ?>">
-                            <p><?= $hero->getName() ?></p>
+                            <p><strong><?= $hero->getName() ?></strong></p>
+                            <p>⚔️ <?= $hero->getHeroClass() ?></p>
                             <p>❤️ <?= $hero->getHealthPoint() ?> HP</p>
                             <input type="hidden" name="id" value="<?= $hero->getId() ?>">
                         </div>

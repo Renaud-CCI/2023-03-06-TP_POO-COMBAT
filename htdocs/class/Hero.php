@@ -2,12 +2,15 @@
 
 class Hero
 {
-    private $id;
-    private $name;
-    private $healthPoint;
+    protected $id;
+    protected $name;
+    protected $healthPoint;
+    protected $energy;
+    protected $heroClass;
 
     public function __construct(array $data)
     {
+        
         if(isset($data['id'])){
             $this->setId($data['id']);
         }
@@ -16,6 +19,12 @@ class Hero
         }
         if(isset($data['health_point'])){
             $this->setHealthPoint($data['health_point']);
+        }
+        if(isset($data['hero_class'])){
+            $this->setHeroClass($data['hero_class']);
+        }
+        if(isset($data['energy'])){
+            $this->setEnergy($data['energy']);
         }
     }
 
@@ -54,5 +63,31 @@ class Hero
     public function setHealthPoint($healthPoint)
     {
         $this->healthPoint = $healthPoint;
+    }
+
+    public function getHeroClass()
+    {
+        return $this->heroClass;
+    }
+
+    public function setHeroClass($heroClass)
+    {
+        $this->heroClass = $heroClass;
+
+        return $this;
+    }
+
+
+    public function getEnergy()
+    {
+        return $this->energy;
+    }
+
+
+    public function setEnergy($energy)
+    {
+        $this->energy = $energy;
+
+        return $this;
     }
 }
