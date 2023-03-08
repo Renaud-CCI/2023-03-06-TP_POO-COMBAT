@@ -1,13 +1,6 @@
 <?php
-$dns = 'mysql:host=127.0.0.1;dbname=combat';
-$user = 'root';
-$password = '';
+$db = new PDO('mysql:host=127.0.0.1;dbname=combat', 'root', '');
+// On émet une alerte à chaque fois qu'une requête a échoué.
+$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING); 
 
-try{
-    $db = new PDO( $dns, $user, $password);
-    // echo "connection établie" ;
-
-}
-catch (Exception $message){
-    echo "ya un blem <br>" . "<pre>$message</pre>" ;
-}
+return $db;

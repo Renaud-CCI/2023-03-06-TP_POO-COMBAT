@@ -1,129 +1,86 @@
-<?php include_once('./config/header.php') ?>
-
-    <?php 
-    $heroes = new HeroesManager($db);
-
-    if (isset($_POST['name'])){
-
-        if ($_POST['name']!="none"){
-            //--------------Préparation de la photo
-
-            // récupération de l'extension de la photo (.jpeg, .png...)
-            $photoExtensionBrute = explode('.', $_FILES['photo']['name']);
-            $photoExtension = strtolower(end($photoExtensionBrute));
-            //Tableau des extensions que l'on accepte
-            $extensions = ['jpg', 'png', 'jpeg', 'gif'];
-
-            // Vérification si l'on accepte ou pas
-            if(in_array($photoExtension, $extensions) && $_FILES['photo']['error'] == 0){
-                $uniqueName = uniqid('', true);
-                //uniqid génère quelque chose comme ca : 5f586bf96dcd38.73540086
-                $photo = "./Images/Avatars/" . $uniqueName.".".$photoExtension;
-                //$file = 5f586bf96dcd38.73540086.jpg
-                move_uploaded_file($_FILES['photo']['tmp_name'], $photo);
-            }
-
-
-            $heroes->add(new Hero($_POST['name'], $photo));
+<?php
+require_once("./config/autoload.php");
+$db = require_once("./config/db.php");
+?>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accueil - TP Jeu de fight</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    <link href="/css/styles.css" rel="stylesheet">
+</head>
+<body>
+    <?php
+        $title = "TP Jeu de Fight";
+        $subtitle = "Un jeu de fight au tour par tour en PHP pour apprendre les bases de la POO";
+        require('partials/header.php');
+        function pretyDump($data){
+            highlight_string("<?php\n\$data =\n" . var_export($data, true) . ";\n?>");
         }
-    
-        $_SESSION['sessionStart'] = 'true';
-        unset ($_SESSION['name']);
-        
-
-    } elseif (!isset ($_SESSION['sessionStart'])){
-        unset($_SESSION['alert']);
-        echo"
-            <section id='loginForm' class=''>
-                <div class='container text-center'>
-                    <form class='' method='post' action='index.php' enctype='multipart/form-data'>
-
-                        <div class='row'>
-
-                            <div class='m-3 col col-4 align-self-center'>
-                                <input name='name' type='text' class='' id='name' placeholder='Choisissez un pseudo'>
-                            </div>
-
-                            <div class='m-3 col col-4 align-self-center border border-primary rounded'>
-                                <label for='photo' class='label-file'>Importer un avatar</label>
-                                <input name='photo' type='file' class='input-file' id='photo' accept='.png, .jpg, .jpeg'>
-                            </div>
-                            
-                            <button class='m-3 col col-2 btn btn-outline-success' type='submit'>
-                                Créer Héro
-                            </button>
-
-                            <div class='preview col col-12'>
-                                <p></p> 
-                            </div>
-            
-                        </div>
-
-                    </form>
-                    
-                    <p>OU</p>
-
-                    <form class='' method='POST' action='index.php'>  
-                        <div class=''>
-                                       
-                            <input class='' type='hidden' name='name' value='none'>
-
-                            <button class='btn btn-outline-info' type='submit'>
-                                Jouer avec un ancien Héro
-                            </button>
-
-                        </div>
-                    </form>
-                </div>
-            </section>    
-        ";
-    }
-    
-    if (isset($_SESSION['sessionStart']) && $_SESSION['sessionStart'] == 'true'){
-
-        echo "<section id='chooseHero' class='container text-center'>";
-
-        if (isset($_SESSION['alert'])){
-            echo"<h2>{$_SESSION['alert']}</h2>";
-        }
-
-        echo"<div class='row text-center p-3 text-warning'>
-                <h2>Choisissez un Héro</h2>
-            </div>
-        ";
-        
-        echo "
-        <form class='' action='fight.php' method='get'>
-            <div class='row text-center justify-content-center p-3'>
-        ";
-
-                // formulaire avatar  
-                foreach ($heroes->findAllAlive() as $heroOfList){
-                    echo "
-                    <div class='col col-2'>
-                        <input class='avatarInputs' type='radio' name='hero_id' id='{$heroOfList['id']}' value='{$heroOfList['id']}' required>
-                        <label class='avatarLabels' for='{$heroOfList['id']}'><img src='{$heroOfList['avatar']}' alt=''></label>
-                        <p>{$heroOfList['name']} : {$heroOfList['health_point']} PV</p>
-                        </div>
-                    ";  
-                }
-            
-                echo "<br><br>";
-                // bouton submit
-        echo "
-            </div>
-
-            <div class='row text-center justify-content-center p-3'>
-                <button class='btn btn-warning btn-lg btn-block' type='submit'>Faire un combat</button>
-            </div>
-        </form>
-
-            <a href='./traitments/reInitIndex.php'>Créer un nouvel Héro</a>
-        </section>
-        ";
-    }
-    
-
-require_once('./config/footer.php');
     ?>
 
+    <?php 
+        
+        $manager = new HeroesManager($db);
+        
+
+        if(isset($_POST['name'])){
+            $hero = new Hero($_POST);
+            $manager->add($hero);
+        }
+
+        $allHeroes = $manager->findAllAlive();
+    ?>
+
+
+
+    <div class="container ">
+        <div class="row">
+            <div class="card col-12 col-sm-6 col-lg-2" style=text-align:center;">
+                <div class="card-body">
+
+
+                    <form method="post">
+                        <h5 class="card-title">Créez votre hero</h5>
+                        <!-- <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6> -->
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nom de votre hero</label>
+                            <input type="text" class="form-control" id="name" placeholder="Nom" name="name">
+                        </div>
+                        <button class="btn btn-primary btn-lg px-4 gap-3">Créer</button>
+                    </form>
+
+                </div>
+            </div>
+
+            <?php foreach ($allHeroes as $hero) : ?>
+            <div class="card col-12 col-sm-6 col-lg-2" style=text-align:center;">
+                <div class="card-body">
+
+                    <form method="get" action="fight.php">
+                        <h5 class="card-title">Hero existant</h5>
+                        <div class="mb-3">
+                            <img src="https://api.dicebear.com/5.x/adventurer/svg?seed=<?= $hero->getName() ?>">
+                            <p><?= $hero->getName() ?></p>
+                            <p>❤️ <?= $hero->getHealthPoint() ?> HP</p>
+                            <input type="hidden" name="id" value="<?= $hero->getId() ?>">
+                        </div>
+                        <button class="btn btn-info btn-lg px-4 gap-3">Choisir</button>
+                    </form>
+                </div>
+            </div>
+            <?php endforeach; ?>
+            
+        </div>
+    </div>
+
+
+
+
+</body>
+
+</html>
