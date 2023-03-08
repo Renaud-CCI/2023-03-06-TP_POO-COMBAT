@@ -6,7 +6,7 @@ class HeroesManager {
     //FUNCTIONS
 
     /*Constructeur*/
-    public function __construct($db){
+    public function __construct(PDO $db){
         $this->setDb($db);
     }
 
