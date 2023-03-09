@@ -23,13 +23,13 @@ $db = require_once("./config/db.php");
         }
     ?>
     <?php
-        $heroesManager = new HeroesManager($db);
+        $warriorsManager = new WarriorsManager($db);
         $fightManager = new FightsManager($db);
-        $hero = $heroesManager->find($_GET['id']);
+        $hero = $warriorsManager->find($_GET['id']);
         $monster = $fightManager->createMonster();
         $fightResult = $fightManager->fight($hero, $monster);
-        $heroesManager->update($hero);
-        $heroesManager->update($monster);
+        $warriorsManager->update($hero);
+        $warriorsManager->update($monster);
     ?>
 
 
@@ -42,7 +42,7 @@ $db = require_once("./config/db.php");
                     <div class="mb-3">
                         <img src="https://api.dicebear.com/5.x/adventurer/svg?seed=<?= $hero->getName() ?>">
                         <p><?= $hero->getName() ?></p>
-                        <p>⚔️ <?= $hero->getHeroClass() ?></p>
+                        <p>⚔️ <?= $hero->getWarriorClass() ?></p>
                         <p>❤️ <?= $hero->getHealthPoint() ?> HP</p>
                     </div>
                 </div>
@@ -61,7 +61,7 @@ $db = require_once("./config/db.php");
                     <div class="mb-3">
                         <img src="https://api.dicebear.com/5.x/bottts/svg?seed=<?= $monster->getName() ?>">
                         <p><?= $monster->getName() ?></p>
-                        <p>⚔️ <?= $monster->getMonsterClass() ?></p>
+                        <p>⚔️ <?= $monster->getWarriorClass() ?></p>
                         <p>❤️ <?= $monster->getHealthPoint() ?> HP</p>
                     </div>
                 </div>

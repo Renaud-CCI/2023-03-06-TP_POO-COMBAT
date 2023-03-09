@@ -4,14 +4,12 @@ class FightsManager
 {
     private $db; 
 
-    public function __construct(PDO $db)
-    {
+    public function __construct(PDO $db){
         $this->setDb($db);
     }
 
 
-    public function fight(Object $hero, Object $monster)
-    {
+    public function fight(Warrior $hero, Warrior $monster){
         $fightResult = []; 
 
         do{
@@ -33,51 +31,42 @@ class FightsManager
         return $fightResult;
     }
 
-    public function createMonster()
-    {
+    public function createMonster(){
         $monsterClassesArray = ['Fantassin', 'Ogre', 'Sorcier'];
         $monsterNamesArray = ['Zuglorb', 'Fartoll', 'Pristomark', 'Doglen', 'Folkmiss', 'Zuzebot', 'Vuitross', 'Hyad', 'Zenzouz', 'Culeru', 'Hu', 'Drijail', 'Kimput', 'Quanno', 'Jouib', 'Xaf', 'Derko', 'Thabili', 'Bribard', 'Nuhot', 'Din', 'Supry'];
         $monsterClass = $monsterClassesArray[array_rand($monsterClassesArray, 1)];
         $monsterName = $monsterNamesArray[array_rand($monsterNamesArray, 1)];
         $healthPoint = rand(100,200);
-        $data = [
+        $dataArray = [
             'name' => $monsterName,
             'health_point' => $healthPoint,
-            'monster_class' => $monsterClass
+            'warrior_class' => $monsterClass
         ];
 
-        $monster = new $monsterClass($data);
+        $monster = new $monsterClass($dataArray);
 
         $this->add($monster);
 
         return $monster;
     } 
 
-    public  function add(Object $monster)
-    {
-        $query = $this->db->prepare('INSERT INTO heroes (name, hero_class) VALUE (:name, :hero_class)');
+    public  function add(Warrior $warrior){
+        $query = $this->db->prepare('   INSERT INTO warriors (name, warrior_class) 
+                                        VALUE (:name, :warrior_class)');
         $query->execute([
-            'name' => $monster->getName(),
-            'hero_class' => $monster->getMonsterClass(),
+            'name' => $warrior->getName(),
+            'warrior_class' => $warrior->getWarriorClass(),
         ]);
 
     }
 
-    public function pretyDump($data){
-        highlight_string("<?php\n\$data =\n" . var_export($data, true) . ";\n?>");
-    }
 
 
-    public function getDb()
-    {
-        return $this->db;
-    }
-
-
-    public function setDb($db)
-    {
+    // GETTERS & SETTERS
+ 
+    public function setDb($db){
         $this->db = $db;
-
-        return $this;
     }
+
 }
+?>

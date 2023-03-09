@@ -2,28 +2,27 @@
 
 class Fantassin extends Monster {
 
-
-    public function __construct(array $data)
-    {
-        if(!isset($data['monster_class'])){
-            array_push($data, "'monster_class' => 'Fantassin'");
+    public function __construct(array $data) {
+        if(!isset($data['warrior_class'])){
+            array_push($data, "'warrior_class' => 'Fantassin'");
         }
         parent::__construct($data);
     }
 
-    public function hit(Hero $hero)
-    {
-        $damage = rand(0,25);
+    public function hit(Warrior $warrior){
+        parent::hit($warrior);
+        $damage= $this->getDamage();
 
-        if ($hero->getHeroClass() == 'Mage'){
+        if ($warrior->getWarriorClass() == 'Mage'){
             $damage *= 2;
         }
 
-        $hero->setHealthPoint($hero->getHealthPoint() - $damage );
+        $warrior->setHealthPoint($warrior->getHealthPoint() - $damage );
         return $damage;
     }
     
 }
+
 
 
 ?>

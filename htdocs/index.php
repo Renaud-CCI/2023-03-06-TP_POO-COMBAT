@@ -25,11 +25,11 @@ $db = require_once("./config/db.php");
 
     <?php 
         
-        $manager = new HeroesManager($db);
+        $manager = new WarriorsManager($db);
         
 
         if(isset($_POST['name'])){
-            $hero = new $_POST['hero_class']($_POST);
+            $hero = new $_POST['warrior_class']($_POST);
             $manager->add($hero); 
         }
 
@@ -52,8 +52,9 @@ $db = require_once("./config/db.php");
                         <div class="mb-3">
                             <label for="name" class="form-label">Nom de votre hero</label>
                             <input type="text" class="form-control" id="name" placeholder="Nom" name="name">
-                            <label for="hero_class" class="form-label">
-                            <select name="hero_class" id="hero_class">
+                            <label for="warrior_class" class="form-label">
+                            <select name="warrior_class" id="warrior_class" class="mt-3 rounded" required>
+                                <option value="" disabled selected>Type</option>
                                 <option value="Archer">Archer</option>
                                 <option value="Guerrier">Guerrier</option>
                                 <option value="Mage">Mage</option>
@@ -74,7 +75,7 @@ $db = require_once("./config/db.php");
                         <div class="mb-3">
                             <img src="https://api.dicebear.com/5.x/adventurer/svg?seed=<?= $hero->getName() ?>">
                             <p><strong><?= $hero->getName() ?></strong></p>
-                            <p>⚔️ <?= $hero->getHeroClass() ?></p>
+                            <p>⚔️ <?= $hero->getWarriorClass() ?></p>
                             <p>❤️ <?= $hero->getHealthPoint() ?> HP</p>
                             <input type="hidden" name="id" value="<?= $hero->getId() ?>">
                         </div>
