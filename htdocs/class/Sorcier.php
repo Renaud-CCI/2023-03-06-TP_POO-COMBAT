@@ -8,21 +8,11 @@ class Sorcier extends Monster {
             array_push($data, "'warrior_class' => 'Sorcier'");
         }
         parent::__construct($data);
+        $this->setExtraDamage('Guerrier');
+        $this->setSpecialHitCost(2);
+        $this->setRestorePVCost(4);
     }
 
-    public function hit(Warrior $warrior){
-        
-        parent::hit($warrior);
-        $damage= $this->getDamage();
-
-        if ($warrior->getWarriorClass() == 'Guerrier'){
-            $damage *= 2;
-        }
-
-        $warrior->setHealthPoint($warrior->getHealthPoint() - $damage );
-        return $damage;
-    }
-    
 }
 
 

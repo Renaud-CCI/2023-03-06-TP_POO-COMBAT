@@ -7,20 +7,11 @@ class Fantassin extends Monster {
             array_push($data, "'warrior_class' => 'Fantassin'");
         }
         parent::__construct($data);
+        $this->setExtraDamage('Mage');
+        $this->setSpecialHitCost(3);
+        $this->setRestorePVCost(3);
     }
 
-    public function hit(Warrior $warrior){
-        parent::hit($warrior);
-        $damage= $this->getDamage();
-
-        if ($warrior->getWarriorClass() == 'Mage'){
-            $damage *= 2;
-        }
-
-        $warrior->setHealthPoint($warrior->getHealthPoint() - $damage );
-        return $damage;
-    }
-    
 }
 
 

@@ -2,14 +2,21 @@
 
 abstract class Hero extends Warrior{
 
-    private $damage;
 
     public function hit(Warrior $warrior){
-        $this->damage = rand(0,50);
+        $damage = rand(0,50);
+        $warrior->setHealthPoint($warrior->getHealthPoint() - $damage );
+        return $damage;
     }
 
-    public function getDamage(){
-        return $this->damage;
+    public function specialHit(Warrior $warrior){
     }
+
+    public function restorePV(){
+    }
+
+
 
 }
+
+?>

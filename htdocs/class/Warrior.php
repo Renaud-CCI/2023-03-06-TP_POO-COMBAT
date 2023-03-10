@@ -6,6 +6,8 @@ abstract class Warrior {
     protected $healthPoint;
     protected $energy;
     protected $warriorClass;
+    protected $specialHitCost;
+    protected $restorePVCost;
 
     public function __construct(array $data){
         
@@ -28,6 +30,9 @@ abstract class Warrior {
 
     abstract public function hit(Warrior $warrior);
 
+    abstract public function specialHit(Warrior $warrior);
+
+    abstract public function restorePV();
 
     // GETTERS & SETTERS
     public function getId(){
@@ -70,6 +75,26 @@ abstract class Warrior {
 
     public function setEnergy($energy){
         $this->energy = $energy;
+    }
+
+    public function getSpecialHitCost(){
+        return $this->specialHitCost;
+    }
+
+    public function setSpecialHitCost($specialHitCost){
+        $this->specialHitCost = $specialHitCost;
+
+        return $this;
+    }
+
+    public function getRestorePVCost(){
+        return $this->restorePVCost;
+    }
+
+    public function setRestorePVCost($restorePVCost){
+        $this->restorePVCost = $restorePVCost;
+
+        return $this;
     }
 }
 

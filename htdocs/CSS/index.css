@@ -1,0 +1,20 @@
+/* CONFIGURATION PARTIE AJOUT D'UN AVATAR */
+
+.warriorInputs {
+    display: none;
+  }
+  
+  .warriorLabels img {
+    width : 6vw;
+    height: 6vw;
+    border-radius:50%;
+  }
+  
+  .warriorInputs:checked + .warriorCard {
+    border : 2px solid rgb(0, 156, 34);
+    border-radius:4%;
+  }
+
+  #createCard{
+    height:100px;
+  }

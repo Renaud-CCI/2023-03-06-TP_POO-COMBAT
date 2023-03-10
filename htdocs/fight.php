@@ -1,6 +1,43 @@
 <?php
 require_once("./config/autoload.php");
 $db = require_once("./config/db.php");
+
+$warriorsManager = new WarriorsManager($db);
+$fightManager = new FightsManager($db);
+
+$hero = $warriorsManager->find($_GET['hero_id']);
+
+if ($_GET['monster_id']=='create'){
+    $monster = $fightManager->createMonster();
+    $newUrl = "fight.php?hero_id={$hero->getId()}&monster_id={$monster->getId()}";
+    header('Location: ' . $newUrl);
+    exit;
+} else {
+    $monster = $warriorsManager->find($_GET['monster_id']);
+}
+
+
+// $fightResult = $fightManager->fight($hero, $monster);
+
+if ($hero->getHealthPoint() > 0 && $monster->getHealthPoint() > 0){
+    if (!isset($_GET['action']) || substr($_GET['action'], 0, 4) == 'hero'){
+        $monsterButtonVisibility = 'visible';
+        $heroButtonVisibility = 'hidden';
+    } else if ($_GET['action'] == 'monster'){
+        $monsterButtonVisibility = 'hidden';
+        $heroButtonVisibility = 'visible';
+    }
+}
+
+if (isset($_GET['action'])){
+    $fightStep = $fightManager->fightDisplay($hero, $monster, $_GET['action']);
+
+    $warriorsManager->update($hero);
+    $warriorsManager->update($monster);
+} else {
+    $fightStep = var_dump($monster);
+}
+    
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -11,26 +48,18 @@ $db = require_once("./config/db.php");
     <title>Fight - TP Jeu de fight</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
-    <link href="/css/styles.css" rel="stylesheet">
+    <link href="./CSS/card.css" rel="stylesheet">
 </head>
 <body>
     <?php
         $title = "🥊 Fight ! 🥊";
-        $subtitle = "Voici le résultat du fight contre le monstre " ;
+        // $subtitle = "Voici le résultat du fight contre le monstre " ;
         require('partials/header.php');
         function pretyDump($data){
             highlight_string("<?php\n\$data =\n" . var_export($data, true) . ";\n?>");
         }
     ?>
-    <?php
-        $warriorsManager = new WarriorsManager($db);
-        $fightManager = new FightsManager($db);
-        $hero = $warriorsManager->find($_GET['id']);
-        $monster = $fightManager->createMonster();
-        $fightResult = $fightManager->fight($hero, $monster);
-        $warriorsManager->update($hero);
-        $warriorsManager->update($monster);
-    ?>
+
 
 
     <div class="container">
@@ -44,6 +73,32 @@ $db = require_once("./config/db.php");
                         <p><?= $hero->getName() ?></p>
                         <p>⚔️ <?= $hero->getWarriorClass() ?></p>
                         <p>❤️ <?= $hero->getHealthPoint() ?> HP</p>
+                        <p>
+                            <div class="progress-wrap progress text-center">
+                                <p>🔋Energie : <?= $hero->getEnergy()?></p>
+                                <div class="progress-bar progress" style="width:<?= $hero->getEnergy()*10?>%"> </div>
+                            </div>
+                        </p>
+                        <div style="visibility:<?= $heroButtonVisibility ?>">
+                            <form action="fight.php" method="get">
+                                <input type="hidden" name='hero_id' value="<?=$_GET['hero_id']?>">
+                                <input type="hidden" name='monster_id' value="<?=$_GET['monster_id']?>">
+                                <input type="hidden" name='action' value="hero_hit">
+                                <input class="btn btn-warning m-1" type="submit" value="Hit">                            
+                            </form>
+                            <form action="fight.php" method="get">
+                                <input type="hidden" name='hero_id' value="<?=$_GET['hero_id']?>">
+                                <input type="hidden" name='monster_id' value="<?=$_GET['monster_id']?>">
+                                <input type="hidden" name='action' value="hero_specialHit">
+                                <input class="btn btn-warning m-1" type="submit" value="Special Hit">                            
+                            </form>
+                            <form action="fight.php" method="get">
+                                <input type="hidden" name='hero_id' value="<?=$_GET['hero_id']?>">
+                                <input type="hidden" name='monster_id' value="<?=$_GET['monster_id']?>">
+                                <input type="hidden" name='action' value="hero_restorePV">
+                                <input class="btn btn-warning m-1" type="submit" value="Restore PV">                            
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -63,16 +118,28 @@ $db = require_once("./config/db.php");
                         <p><?= $monster->getName() ?></p>
                         <p>⚔️ <?= $monster->getWarriorClass() ?></p>
                         <p>❤️ <?= $monster->getHealthPoint() ?> HP</p>
+                        <p>
+                            <div class="progress-wrap progress text-center">
+                                <p>🔋Energie : <?= $monster->getEnergy()?></p>
+                                <div class="progress-bar progress" style="width:<?= $monster->getEnergy()*10?>%"> </div>
+                            </div>
+                        </p>
+                        <div style="visibility:<?= $monsterButtonVisibility ?>">
+                            <form action="fight.php" method="get">
+                                <input type="hidden" name='hero_id' value="<?=$_GET['hero_id']?>">
+                                <input type="hidden" name='monster_id' value="<?=$_GET['monster_id']?>">
+                                <input type="hidden" name='action' value="monster">
+                                <input class="btn btn-warning m-1" type="submit" value="Action Aléatoire">                            
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <ul class="list-group list-group-numbered">
-            <?php foreach ($fightResult as $key => $result) : ?>
-                <li class="list-group-item <?= $key % 2 ? 'list-group-item-primary' : 'list-group-item-danger' ?>"><?= $result ?></li>
-            <?php endforeach; ?>   
-        </ul>
+        <div id="fightComment">
+            <?= $fightStep ?>
+        </div>
     </div>
 
     <div style="margin:20px auto;width:200px;text-align:center;">

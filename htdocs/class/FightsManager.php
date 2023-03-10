@@ -31,9 +31,85 @@ class FightsManager
         return $fightResult;
     }
 
+    public function fightDisplay(Warrior $hero, Warrior $monster, string $action){
+
+        switch($action){
+
+            case 'hero_hit':
+                $damage = $hero->hit($monster); 
+                $returnString="{$hero->getName()} inflige {$damage} dégats à {$monster->getName()}. ";
+                if($monster->getHealthPoint() <= 0){
+                    $returnString .= "{$monster->getName()} est mort. ";
+                }
+                return $returnString;
+                break;
+
+            case 'hero_specialHit':
+                $damage = $hero->specialHit($monster); 
+                $returnString="{$hero->getName()} inflige {$damage} dégats à {$monster->getName()} et perd {$hero->getSpecialHitCost()} d'énergie. ";
+                if($monster->getHealthPoint() <= 0){
+                    $returnString .= "{$monster->getName()} est mort. ";
+                }
+                return $returnString;
+                break;
+
+            case 'hero_restorePV':
+                $restoredPV = $hero->restorePV(); 
+                $returnString="{$hero->getName()} récupère {$restoredPV} PV et perd {$hero->getRestorePVCost()} d'énergie. ";
+                if($monster->getHealthPoint() <= 0){
+                    $returnString .= "{$monster->getName()} est mort. ";
+                }
+                return $returnString;
+                break;
+
+            case 'monster':
+                return $this->monsterRandomAction($hero, $monster);
+                break;
+
+            default:
+                return 'error';
+        }
+        
+    }
+
+    /*fonction qui fait faire une action au hasard au monstre*/
+    public function monsterRandomAction(Warrior $hero, Warrior $monster){
+        $actionsArray = ['hit', 'specialHit', 'restorePV'];
+        $monsterAction = $actionsArray[array_rand($actionsArray, 1)];
+        switch($monsterAction){
+
+            case 'hit':
+                $damage = $monster->hit($hero); 
+                $returnString="{$monster->getName()} inflige {$damage} dégats à {$hero->getName()}.\n";
+                if($hero->getHealthPoint() <= 0){
+                    $returnString .= "{$hero->getName()} est mort.\n";
+                }
+                return $returnString;
+                break;
+
+            case 'specialHit':
+                $damage = $monster->specialHit($hero); 
+                $returnString="{$monster->getName()} inflige {$damage} dégats à {$hero->getName()} et perd {$monster->getSpecialHitCost()} d'énergie.\n";
+                if($hero->getHealthPoint() <= 0){
+                    $returnString .= "{$hero->getName()} est mort.\n";
+                }
+                return $returnString;
+                break;
+
+            case 'restorePV':
+                $restoredPV = $monster->restorePV(); 
+                $returnString="{$monster->getName()} récupère {$restoredPV} PV et perd {$monster->getRestorePVCost()} d'énergie.\n";
+                if($hero->getHealthPoint() <= 0){
+                    $returnString .= "{$hero->getName()} est mort.\n";
+                }
+                return $returnString;
+                break;
+        }
+    }
+
     public function createMonster(){
         $monsterClassesArray = ['Fantassin', 'Ogre', 'Sorcier'];
-        $monsterNamesArray = ['Zuglorb', 'Fartoll', 'Pristomark', 'Doglen', 'Folkmiss', 'Zuzebot', 'Vuitross', 'Hyad', 'Zenzouz', 'Culeru', 'Hu', 'Drijail', 'Kimput', 'Quanno', 'Jouib', 'Xaf', 'Derko', 'Thabili', 'Bribard', 'Nuhot', 'Din', 'Supry'];
+        $monsterNamesArray = ['Zuglorb', 'Felge', 'Selpert', 'Xuros', 'Tuyangle', 'Foska', 'Jiccim', 'Gual', 'Hermontais', 'Folowi', 'Cressail', 'Fartoll', 'Pristomark', 'Doglen', 'Folkmiss', 'Zuzebot', 'Vuitross', 'Hyad', 'Zenzouz', 'Culeru', 'Hu', 'Drijail', 'Kimput', 'Quanno', 'Jouib', 'Xaf', 'Derko', 'Thabili', 'Bribard', 'Nuhot', 'Din', 'Supry'];
         $monsterClass = $monsterClassesArray[array_rand($monsterClassesArray, 1)];
         $monsterName = $monsterNamesArray[array_rand($monsterNamesArray, 1)];
         $healthPoint = rand(100,200);
@@ -45,7 +121,8 @@ class FightsManager
 
         $monster = new $monsterClass($dataArray);
 
-        $this->add($monster);
+        $id = $this->add($monster);
+        $monster->setId($id);
 
         return $monster;
     } 
@@ -57,6 +134,12 @@ class FightsManager
             'name' => $warrior->getName(),
             'warrior_class' => $warrior->getWarriorClass(),
         ]);
+
+        $query = $this->db->query('SELECT LAST_INSERT_ID() FROM warriors');
+        $data = $query->fetch();
+        
+        return $data[0];
+       
 
     }
 

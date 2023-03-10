@@ -7,20 +7,12 @@ class Ogre extends Monster {
             array_push($data, "'warrior_class' => 'Ogre'");
         }
         parent::__construct($data);
+        $this->setExtraDamage('Archer');
+        $this->setSpecialHitCost(4);
+        $this->setRestorePVCost(2);
     }
 
-    public function hit(Warrior $warrior){
-        
-        parent::hit($warrior);
-        $damage= $this->getDamage();
-
-        if ($warrior->getWarriorClass() == 'Archer'){
-            $damage *= 2;
-        }
-
-        $warrior->setHealthPoint($warrior->getHealthPoint() - $damage );
-        return $damage;
-    }
+    
     
 }
 
