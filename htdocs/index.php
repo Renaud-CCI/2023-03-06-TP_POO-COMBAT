@@ -83,9 +83,14 @@ $db = require_once("./config/db.php");
                                 <img src="https://api.dicebear.com/5.x/adventurer/svg?seed=<?= $hero->getName() ?>">
                                 <p><strong><?= $hero->getName() ?></strong></p>
                                 <p>⚔️ <?= $hero->getWarriorClass() ?></p>
-                                <p>❤️ <?= $hero->getHealthPoint() ?> HP</p>
                                 <p>
-                                    <div class="progress-wrap progress text-center">
+                                    <div class="progress-wrap-HP progress text-center">
+                                        <p>❤️ HP : <?= $hero->getHealthPoint()?></p>
+                                        <div class="progress-bar progress" style="width:<?= $hero->getHealthPoint()?>%"> </div>
+                                    </div>
+                                </p>
+                                <p>
+                                    <div class="progress-wrap-Energy progress text-center">
                                       <p>🔋Energie : <?= $hero->getEnergy()?></p>
                                       <div class="progress-bar progress" style="width:<?= $hero->getEnergy()*10?>%"> </div>
                                     </div>
@@ -97,6 +102,7 @@ $db = require_once("./config/db.php");
                 <?php endforeach; ?>
                 </div>
 
+            
                 <div class="row text-center m-3">
                     <h1 class="display-5 fw-bold">🥊 VS 🥊</h1>
                 </div>
@@ -104,17 +110,17 @@ $db = require_once("./config/db.php");
                 <div class="row">
 
                     <input class='warriorInputs' type='radio' name='monster_id' id='create' value='create' required>
-                        <div id="createCard" class="card warriorCard col-12 col-sm-6 col-lg-2 m-1 align-self-center" style="text-align:center;">
+                        <div id="createCard" class="card warriorCard col-12 col-sm-6 col-lg-2 m-1 align-self-center fs-4" style="text-align:center;">
                             <label class='warriorLabels' for='create'>
-                                <h5 class="card-title">Créer un Monstre aléatoire</h5>  
+                                <h5 class="card-title align-self-center fs-3">Créer un Monstre aléatoire</h5>  
                             </label>
                         </div>
-               
+            
         
 
 
                 <?php foreach ($allMonsters as $monster) : ?>  
-                   
+                
                     <input class='warriorInputs' type='radio' name='monster_id' id='<?=$monster->getId()?>' value='<?=$monster->getId()?>' required>
                     <div class="card warriorCard col-12 col-sm-6 col-lg-2 m-1" style="text-align:center;">
 
@@ -124,11 +130,16 @@ $db = require_once("./config/db.php");
                                 <img src="https://api.dicebear.com/5.x/bottts/svg?seed=<?= $monster->getName() ?>">
                                 <p><strong><?= $monster->getName() ?></strong></p>
                                 <p>⚔️ <?= $monster->getWarriorClass() ?></p>
-                                <p>❤️ <?= $monster->getHealthPoint() ?> HP</p>
                                 <p>
-                                    <div class="progress-wrap progress text-center">
-                                      <p>🔋Energie : <?= $monster->getEnergy()?></p>
-                                      <div class="progress-bar progress" style="width:<?= $monster->getEnergy()*10?>%"> </div>
+                                    <div class="progress-wrap-HP progress text-center">
+                                        <p>❤️ HP : <?= $monster->getHealthPoint()?></p>
+                                        <div class="progress-bar progress" style="width:<?= $monster->getHealthPoint()?>%"> </div>
+                                    </div>
+                                </p>
+                                <p>
+                                    <div class="progress-wrap-Energy progress text-center">
+                                    <p>🔋Energie : <?= $monster->getEnergy()?></p>
+                                    <div class="progress-bar progress" style="width:<?= $monster->getEnergy()*10?>%"> </div>
                                     </div>
                                 </p>
                                 
@@ -139,8 +150,9 @@ $db = require_once("./config/db.php");
                 <?php endforeach; ?>
                 </div>
 
-                    
+       
 
+                <input type="hidden" name="new_play" value="true">
 
                 <input class="btn btn-warning m-3" type="submit" value="🔥 Combattre ! 🔥">
 

@@ -46,7 +46,7 @@ class FightsManager
 
             case 'hero_specialHit':
                 $damage = $hero->specialHit($monster); 
-                $returnString="{$hero->getName()} inflige {$damage} dégats à {$monster->getName()} et perd {$hero->getSpecialHitCost()} d'énergie. ";
+                $returnString="{$hero->getName()} inflige {$damage} dégats à {$monster->getName()} et perd {$hero->getSpecialHitCost()}🔋. ";
                 if($monster->getHealthPoint() <= 0){
                     $returnString .= "{$monster->getName()} est mort. ";
                 }
@@ -55,9 +55,20 @@ class FightsManager
 
             case 'hero_restorePV':
                 $restoredPV = $hero->restorePV(); 
-                $returnString="{$hero->getName()} récupère {$restoredPV} PV et perd {$hero->getRestorePVCost()} d'énergie. ";
+                $returnString="{$hero->getName()} récupère {$restoredPV} PV et perd {$hero->getRestorePVCost()}🔋. ";
                 if($monster->getHealthPoint() <= 0){
                     $returnString .= "{$monster->getName()} est mort. ";
+                }
+                return $returnString;
+                break;
+
+            case 'hero_poison':
+                $damage = $hero->hit($monster);
+                $monster->setPoisoned(1);
+                $hero->setEnergy($hero->getEnergy() - 8);
+                $returnString="{$hero->getName()} inflige {$damage} dégats à {$monster->getName()} et l'empoisonne.\n";
+                if($monster->getHealthPoint() <= 0){
+                    $returnString .= "{$monster->getName()} est mort.\n";
                 }
                 return $returnString;
                 break;
@@ -74,7 +85,15 @@ class FightsManager
 
     /*fonction qui fait faire une action au hasard au monstre*/
     public function monsterRandomAction(Warrior $hero, Warrior $monster){
-        $actionsArray = ['hit', 'specialHit', 'restorePV'];
+        $actionsArray = ['hit'];
+        if ($monster->getEnergy() >= $monster->getSpecialHitCost()){
+            array_push($actionsArray, 'specialHit');
+        }
+        if ($monster->getEnergy() >= $monster->getRestorePVCost()){
+            array_push($actionsArray, 'restorePV');
+        }
+
+
         $monsterAction = $actionsArray[array_rand($actionsArray, 1)];
         switch($monsterAction){
 
@@ -89,7 +108,7 @@ class FightsManager
 
             case 'specialHit':
                 $damage = $monster->specialHit($hero); 
-                $returnString="{$monster->getName()} inflige {$damage} dégats à {$hero->getName()} et perd {$monster->getSpecialHitCost()} d'énergie.\n";
+                $returnString="{$monster->getName()} inflige {$damage} dégats à {$hero->getName()} et perd {$monster->getSpecialHitCost()}🔋.\n";
                 if($hero->getHealthPoint() <= 0){
                     $returnString .= "{$hero->getName()} est mort.\n";
                 }
@@ -98,12 +117,13 @@ class FightsManager
 
             case 'restorePV':
                 $restoredPV = $monster->restorePV(); 
-                $returnString="{$monster->getName()} récupère {$restoredPV} PV et perd {$monster->getRestorePVCost()} d'énergie.\n";
+                $returnString="{$monster->getName()} récupère {$restoredPV} PV et perd {$monster->getRestorePVCost()}🔋.\n";
                 if($hero->getHealthPoint() <= 0){
                     $returnString .= "{$hero->getName()} est mort.\n";
                 }
                 return $returnString;
                 break;
+
         }
     }
 

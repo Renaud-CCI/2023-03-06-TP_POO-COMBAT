@@ -7,37 +7,92 @@ $fightManager = new FightsManager($db);
 
 $hero = $warriorsManager->find($_GET['hero_id']);
 
+// Création d'un monstre si option create choisie et redirection avec un $_GET['monster_id'] correspondant
 if ($_GET['monster_id']=='create'){
     $monster = $fightManager->createMonster();
     $newUrl = "fight.php?hero_id={$hero->getId()}&monster_id={$monster->getId()}";
     header('Location: ' . $newUrl);
     exit;
-} else {
+} elseif ($_GET['monster_id']!='create') {
     $monster = $warriorsManager->find($_GET['monster_id']);
+    if (isset($_GET['new_play'])){
+        $monster->setPoisoned(0);
+    }
 }
 
+// Création de la variable permettant d'aficher le texte du déroulé du combat
+$fightStep = "";
 
-// $fightResult = $fightManager->fight($hero, $monster);
 
+// Combat si action demandée
+if (isset($_GET['action'])){
+    $fightStep .= $fightManager->fightDisplay($hero, $monster, $_GET['action']);
+
+} else {
+    $fightStep .= '⏳ Ready ? ⏳';
+}
+
+// Gestion de l'empoisonnement
+$monsterPoisonVisibility = 'hidden';
+if ($monster->getHealthPoint()>0 && $monster->getPoisoned() == 1){
+    $monsterPoisonVisibility = 'visible';
+    $monster->setHealthPoint($monster->getHealthPoint() - 10);
+    $fightStep .= "<br> {$monster->getName()} est empoisonné et perd 10 PV";
+    if ($monster->getHealthPoint() <= 0){
+        $fightStep .= "{$monster->getName()} est mort. ";
+    }
+}
+
+// Affichage des boutons de combat selon priorité et si warriors vivants
+// et incrémente une energie par tour
 if ($hero->getHealthPoint() > 0 && $monster->getHealthPoint() > 0){
     if (!isset($_GET['action']) || substr($_GET['action'], 0, 4) == 'hero'){
         $monsterButtonVisibility = 'visible';
         $heroButtonVisibility = 'hidden';
+        if (isset($_GET['action']) && substr($_GET['action'], 0, 4) == 'hero'){
+            if ($monster->getEnergy() <10){
+                $monster->setEnergy($monster->getEnergy() + 1);
+                $fightStep .= "<br> {$monster->getName()} récupère 1🔋";
+            }
+
+        }
     } else if ($_GET['action'] == 'monster'){
         $monsterButtonVisibility = 'hidden';
         $heroButtonVisibility = 'visible';
+
+        if ($hero->getEnergy() <10){
+            $hero->setEnergy($hero->getEnergy() + 1);
+            $fightStep .= "<br> {$hero->getName()} récupère 1🔋";
+        } 
+
+
+        // Affichage des boutons correspondants à l'energie dispo
+        $heroSpecialHitButtonVisibility = 'hidden';
+        $heroRestorePVButtonVisibility = 'hidden';
+        $heroPoisonButtonVisibility = 'hidden';
+        if ($hero->getEnergy() >= $hero->getSpecialHitCost()){
+            $heroSpecialHitButtonVisibility = 'visible';
+        }
+        if ($hero->getEnergy() >= $hero->getRestorePVCost()){
+            $heroRestorePVButtonVisibility = 'visible';
+        }
+        if ($hero->getEnergy() >= 8){
+            $heroPoisonButtonVisibility = 'visible';
+        }  
+      
     }
-}
 
-if (isset($_GET['action'])){
-    $fightStep = $fightManager->fightDisplay($hero, $monster, $_GET['action']);
-
-    $warriorsManager->update($hero);
-    $warriorsManager->update($monster);
 } else {
-    $fightStep = var_dump($monster);
+    $monsterButtonVisibility = 'hidden';
+    $heroButtonVisibility = 'hidden';
 }
+
     
+$warriorsManager->update($hero);
+$warriorsManager->update($monster);
+
+
+
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -72,9 +127,14 @@ if (isset($_GET['action'])){
                         <img src="https://api.dicebear.com/5.x/adventurer/svg?seed=<?= $hero->getName() ?>">
                         <p><?= $hero->getName() ?></p>
                         <p>⚔️ <?= $hero->getWarriorClass() ?></p>
-                        <p>❤️ <?= $hero->getHealthPoint() ?> HP</p>
                         <p>
-                            <div class="progress-wrap progress text-center">
+                            <div class="progress-wrap-HP progress text-center">
+                                <p>❤️ HP : <?= $hero->getHealthPoint()?></p>
+                                <div class="progress-bar progress" style="width:<?= $hero->getHealthPoint()?>%"> </div>
+                            </div>
+                        </p>
+                        <p>
+                            <div class="progress-wrap-Energy progress text-center">
                                 <p>🔋Energie : <?= $hero->getEnergy()?></p>
                                 <div class="progress-bar progress" style="width:<?= $hero->getEnergy()*10?>%"> </div>
                             </div>
@@ -90,22 +150,28 @@ if (isset($_GET['action'])){
                                 <input type="hidden" name='hero_id' value="<?=$_GET['hero_id']?>">
                                 <input type="hidden" name='monster_id' value="<?=$_GET['monster_id']?>">
                                 <input type="hidden" name='action' value="hero_specialHit">
-                                <input class="btn btn-warning m-1" type="submit" value="Special Hit">                            
+                                <input class="btn btn-warning m-1" type="submit" value="Special Hit (🔋x<?= $hero->getSpecialHitCost() ?>)" style="visibility:<?= $heroSpecialHitButtonVisibility ?>">                            
                             </form>
                             <form action="fight.php" method="get">
                                 <input type="hidden" name='hero_id' value="<?=$_GET['hero_id']?>">
                                 <input type="hidden" name='monster_id' value="<?=$_GET['monster_id']?>">
                                 <input type="hidden" name='action' value="hero_restorePV">
-                                <input class="btn btn-warning m-1" type="submit" value="Restore PV">                            
+                                <input class="btn btn-warning m-1" type="submit" value="Restore PV (🔋x<?= $hero->getRestorePVCost() ?>)" style="visibility:<?= $heroRestorePVButtonVisibility ?>">                            
+                            </form>
+                            <form action="fight.php" method="get">
+                                <input type="hidden" name='hero_id' value="<?=$_GET['hero_id']?>">
+                                <input type="hidden" name='monster_id' value="<?=$_GET['monster_id']?>">
+                                <input type="hidden" name='action' value="hero_poison">
+                                <input class="btn btn-warning m-1" type="submit" value="Hit + Poison (🔋x8)" style="visibility:<?= $heroPoisonButtonVisibility ?>">                            
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-1 m-1 align-self-center" style="text-align:center;">
+            <div class="col-4 m-1 align-self-center fs-1" style="text-align:center;">
                 <div class="card-body">
-                    <h2 class="card-title">🌩️</h2>
+                    <?= $fightStep ?>
                 </div>
             </div>
 
@@ -117,13 +183,23 @@ if (isset($_GET['action'])){
                         <img src="https://api.dicebear.com/5.x/bottts/svg?seed=<?= $monster->getName() ?>">
                         <p><?= $monster->getName() ?></p>
                         <p>⚔️ <?= $monster->getWarriorClass() ?></p>
-                        <p>❤️ <?= $monster->getHealthPoint() ?> HP</p>
                         <p>
-                            <div class="progress-wrap progress text-center">
+                            <div class="progress-wrap-HP progress text-center">
+                                <p>❤️ HP : <?= $monster->getHealthPoint()?></p>
+                                <div class="progress-bar progress" style="width:<?= $monster->getHealthPoint()?>%"> </div>
+                            </div>
+                        </p>
+                        <p>
+                            <div class="progress-wrap-Energy progress text-center">
                                 <p>🔋Energie : <?= $monster->getEnergy()?></p>
                                 <div class="progress-bar progress" style="width:<?= $monster->getEnergy()*10?>%"> </div>
                             </div>
                         </p>
+                        <p>Double-dégats sur <?=$monster->getExtraDamage('Archer')?></p>
+                        <p style="visibility:<?=$monsterPoisonVisibility?>" class="text-red">
+                            💀 Empoisonné ! 💀
+                        </p>
+
                         <div style="visibility:<?= $monsterButtonVisibility ?>">
                             <form action="fight.php" method="get">
                                 <input type="hidden" name='hero_id' value="<?=$_GET['hero_id']?>">
@@ -137,9 +213,7 @@ if (isset($_GET['action'])){
             </div>
         </div>
 
-        <div id="fightComment">
-            <?= $fightStep ?>
-        </div>
+
     </div>
 
     <div style="margin:20px auto;width:200px;text-align:center;">

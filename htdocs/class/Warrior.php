@@ -8,6 +8,7 @@ abstract class Warrior {
     protected $warriorClass;
     protected $specialHitCost;
     protected $restorePVCost;
+    protected $poisoned;
 
     public function __construct(array $data){
         
@@ -25,6 +26,9 @@ abstract class Warrior {
         }
         if(isset($data['energy'])){
             $this->setEnergy($data['energy']);
+        }
+        if(isset($data['poisoned'])){
+            $this->setPoisoned($data['poisoned']);
         }
     }
 
@@ -96,6 +100,17 @@ abstract class Warrior {
 
         return $this;
     }
+
+    public function getPoisoned(){
+        return $this->poisoned;
+    }
+
+    public function setPoisoned($poisoned){
+        $this->poisoned = $poisoned;
+
+        return $this;
+    }
+
 }
 
 ?>

@@ -59,11 +59,12 @@ class WarriorsManager
     
     public function update(Warrior $warrior){
         $query = $this->db->prepare('   UPDATE warriors  
-                                        SET health_point = :health_point, energy = :energy
+                                        SET health_point = :health_point, energy = :energy, poisoned = :poisoned
                                         WHERE id = :id');
         $query->bindValue(':id', $warrior->getId());
         $query->bindValue(':energy', $warrior->getEnergy());
         $query->bindValue(':health_point', $warrior->getHealthPoint());
+        $query->bindValue(':poisoned', $warrior->getPoisoned());
         $query->execute();
     }
     

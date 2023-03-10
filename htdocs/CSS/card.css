@@ -1,24 +1,33 @@
 .progress {
   width: 100%;
-  height: 15px;
+  height: 25px;
 }
-.progress-wrap {
-  background: #ddd;
+.progress-wrap-HP, .progress-wrap-Energy {
+  background: #838383;
   margin: 20px 0;
   overflow: hidden;
   position: relative;
 }
-.progress-wrap .progress-bar {
-  background: #a8002a;
+
+.progress-wrap-HP .progress-bar {
+  background: #a80076;
   left: 0;
   position: absolute;
   top: 0;
 }
 
-.progress-wrap p{
+.progress-wrap-Energy .progress-bar {
+  background: #0078a8;
+  left: 0;
+  position: absolute;
+  top: 0;
+}
+
+.progress-wrap-Energy p, .progress-wrap-HP p{
   z-index: 100;
-  color: white;
+  color: rgb(255, 255, 255);
   margin: auto;
+  font-size: 1.2vh;
 }
 
 
